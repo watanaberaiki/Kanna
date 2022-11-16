@@ -250,7 +250,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// 3Dオブジェクト静的初期化
 	ParticleManager::StaticInitialize(DXInit.device.Get(), winApp.subWindow_width, winApp.subWindow_height);
 
-	//パーティクルクラスの初期化
+	//パーティクルクラスの初期化 
 	ParticleManager* particleManager = nullptr;
 
 
