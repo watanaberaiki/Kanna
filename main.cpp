@@ -248,7 +248,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 	// 3Dオブジェクト静的初期化
-	ParticleManager::StaticInitialize(DXInit.device.Get(), winApp.subWindow_width, winApp.subWindow_height);
+	ParticleManager::StaticInitialize(DXInit.device.Get(), WindowsApp::window_width, WindowsApp::window_height);
 
 	//パーティクルクラスの初期化 
 	ParticleManager* particleManager = nullptr;
@@ -435,7 +435,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// 頂点シェーダの読み込みとコンパイル
 	DXInit.result = D3DCompileFromFile
-	(L"BasicVS.hlsl", // シェーダファイル名
+	(L"Resources/Shaders/BasicVS.hlsl", // シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "vs_5_0", // エントリーポイント名、シェーダーモデル指定
@@ -460,7 +460,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// ピクセルシェーダの読み込みとコンパイル
 	DXInit.result = D3DCompileFromFile
-	(L"BasicPS.hlsl", // シェーダファイル名
+	(L"Resources/Shaders/BasicPS.hlsl", // シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "ps_5_0", // エントリーポイント名、シェーダーモデル指定
@@ -1060,7 +1060,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	int isSway = 0;
 	int swayCount = 0;
 	int shook = 0;
-	int oldeyeY = 0;
+	XMFLOAT3 oldeye = { 0,0,0 };
+	XMFLOAT3 oldtarget = { 0,0,0 };
+	int eyeUp = 1;
+	int eyeDown = 0;
 	//敵を倒した演出
 	int isDead = 0;
 	int isZoom = 0;
@@ -1073,7 +1076,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	float angle = 0.0f;
 	float saveAngle = 0.0f;
 
-	
+
 
 
 	//並行投影行列の計算
@@ -1434,32 +1437,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		if (sceneNo_ == SceneNo::Game) {
 			if (isTutorial == 1) {
-				//パーティクル範囲
-				for (int i = 0; i < 100; i++) {
-					//X,Y,Z全て[-5.0f,+5.0f]でランダムに分布
-					const float rnd_pos = 10.0f;
-					XMFLOAT3 pos{};
-					pos.x = (float)rand() / RAND_MAX * rnd_pos - rnd_pos / 2.0f;
-					pos.y = (float)rand() / RAND_MAX * rnd_pos - rnd_pos / 2.0f;
-					pos.z = (float)rand() / RAND_MAX * rnd_pos - rnd_pos / 2.0f;
 
-					//X,Y,Z全て[-0.05f,+0.05f]でランダムに分布
-					const float rnd_vel = 0.1f;
-					XMFLOAT3 vel{};
-					vel.x = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
-					vel.y = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
-					vel.z = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
-					//重力に見立ててYのみ[-0.001f,0]でランダムに分布
-					const float rnd_acc = 0.001f;
-					XMFLOAT3 acc{};
-					acc.y = -(float)rand() / RAND_MAX * rnd_acc;
 
-					//追加
-					particleManager->Add(60, pos, vel, acc);
-
-				}
-
-				particleManager->Update();
 
 				//弾
 				if (input->TriggerKey(DIK_SPACE)) {
@@ -1526,28 +1505,92 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			if (isStart == 1) {
 
 				if (EnemyPosition.y > 0) {
-					EnemyPosition.y-=2;
+					EnemyPosition.y -= 2;
 				}
 
-				if (isSway == 0 && EnemyPosition.y == 0) {
+				if (isSway == 0 && EnemyPosition.y <= 0) {
 					isSway = 1;
-					oldeyeY = eye.y;
+					oldeye = eye;
+					oldtarget = target;
 				}
 
 				if (isSway == 1) {
-					if (swayCount != 100) {
-						if (eye.y == oldeyeY) {
+					if (swayCount != 20) {
 
+						//パーティクル範囲
+						for (int i = 0; i < 1; i++) {
+							//X,Y,Z全て[-5.0f,+5.0f]でランダムに分布
+							const float rnd_pos = 0.1f;
+							const float rnd_posX = 1.0f;
+							XMFLOAT3 pos{};
+							EnemyPosition.x += (float)rand() / RAND_MAX * rnd_posX - rnd_posX / 2.0f;
+							EnemyPosition.y += (float)rand() / RAND_MAX * rnd_pos - rnd_pos / 2.0f;
+							EnemyPosition.z += (float)rand() / RAND_MAX * rnd_pos - rnd_pos / 2.0f;
+
+							//速度
+							//X,Y,Z全て[-0.05f,+0.05f]でランダムに分布
+							const float rnd_vel = 0.01f;
+							XMFLOAT3 vel{};
+							vel.x = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+							vel.y = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+							vel.z = (float)rand() / RAND_MAX * rnd_vel - rnd_vel / 2.0f;
+							//重力に見立ててYのみ[-0.001f,0]でランダムに分布
+							const float rnd_acc = 0.001f;
+							XMFLOAT3 acc{};
+							acc.y = (float)rand() / RAND_MAX * rnd_acc;
+
+							//追加
+							particleManager->Add(60, EnemyPosition, vel, acc);
+
+							particleManager->Update();
 						}
+
+						if (eye.y == oldeye.y && eyeUp == 1) {
+							eye.x += 2;
+							eye.y += 2;
+							target.x += 2;
+							target.y += 2;
+							swayCount++;
+						}
+						else if (eye.y == oldeye.y && eyeDown == 1) {
+							eye.x -= 2;
+							eye.y -= 2;
+							target.x -= 2;
+							target.y -= 2;
+							swayCount++;
+						}
+						else if (eye.y != oldeye.y && eyeUp == 1) {
+							eye = oldeye;
+							target = oldtarget;
+							eyeUp = 0;
+							eyeDown = 1;
+							swayCount;
+						}
+						else if (eye.y != oldeye.y && eyeDown == 1) {
+							eye = oldeye;
+							target = oldtarget;
+							eyeDown = 0;
+							eyeUp = 1;
+							swayCount;
+						}
+					}
+					else if (swayCount == 20) {
+						isSway = 0;
+						eye = oldeye;
+						target = oldtarget;
+						shook = 1;
 					}
 				}
 
-				if (eye.z <-500 && shook == 1) {
-					eye.z-= 2;
+				if (eye.z > -500 && shook == 1) {
+					eye.z -= 2;
+					particleManager->Update();
 				}
-				else if(eye.z == -500) {
+				else if (eye.z == -500) {
 					isStart = 0;
 				}
+				//ビュー変換行列を作り直す
+				matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
 			}
 
 			//ゲーム中
@@ -2140,17 +2183,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 
 		if (sceneNo_ == SceneNo::Game) {
-			// 3Dオブジェクト描画前処理
-			ParticleManager::PreDraw(DXInit.commandList.Get());
 
-			// 3Dオブクジェクトの描画
-			particleManager->Draw();
-
-			// 3Dオブジェクト描画後処理
-			ParticleManager::PostDraw();
 
 			//チュートリアル
 			if (isTutorial == 1) {
+
+
+				////インデックスバッファビューの設定コマンド
+				//DXInit.commandList->IASetIndexBuffer(&ibView);
+
+				////0番定数バッファビュー(CBV)の設定コマンド
+				//DXInit.commandList->SetGraphicsRootConstantBufferView(2, constBuffTransform0->GetGPUVirtualAddress());
+
+
+				//// 描画コマンド
+				//DXInit.commandList->DrawIndexedInstanced(_countof(indices), 1, 0, 0, 0);
+
+
 				if (Hit2 == FALSE) {
 					DXInit.commandList->SetGraphicsRootConstantBufferView(2, constBuffTransform2->GetGPUVirtualAddress());
 
@@ -2167,6 +2216,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			}
 			else if (isTutorial == 0) {
+
+
 				//インデックスバッファビューの設定コマンド
 				DXInit.commandList->IASetIndexBuffer(&ibView);
 
@@ -2185,6 +2236,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					DXInit.commandList->DrawIndexedInstanced(_countof(indices), 1, 0, 0, 0);
 				}
 
+				// 3Dオブジェクト描画前処理
+				ParticleManager::PreDraw(DXInit.commandList.Get());
+
+				// 3Dオブクジェクトの描画
+				particleManager->Draw();
+
+				// 3Dオブジェクト描画後処理
+				ParticleManager::PostDraw();
+
 				/*debugText.Print("obj", 50, 110, 1.0);*/
 			}
 
@@ -2196,6 +2256,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 				DXInit.commandList->DrawIndexedInstanced(_countof(indices), 1, 0, 0, 0);
 			}*/
+
+
 		}
 
 		if (sceneNo_ == SceneNo::Tuto) {

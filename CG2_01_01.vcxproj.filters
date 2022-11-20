@@ -15,24 +15,38 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Basic.hlsli" />
-    <None Include="SpriteShaderHeader.hlsli">
+    <None Include="Resources\Shaders\Basic.hlsli">
       <Filter>リソース ファイル</Filter>
     </None>
-    <None Include="Particle.hlsli" />
+    <None Include="Resources\Shaders\Particle.hlsli">
+      <Filter>リソース ファイル</Filter>
+    </None>
+    <None Include="Resources\Shaders\SpriteShaderHeader.hlsli">
+      <Filter>リソース ファイル</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="BasicPS.hlsl" />
-    <FxCompile Include="BasicVS.hlsl" />
-    <FxCompile Include="SpritePixelShader.hlsl">
+    <FxCompile Include="Resources\Shaders\BasicPS.hlsl">
       <Filter>リソース ファイル</Filter>
     </FxCompile>
-    <FxCompile Include="SpriteVertexShader.hlsl">
+    <FxCompile Include="Resources\Shaders\BasicVS.hlsl">
       <Filter>リソース ファイル</Filter>
     </FxCompile>
-    <FxCompile Include="ParticleGS.hlsl" />
-    <FxCompile Include="ParticlePS.hlsl" />
-    <FxCompile Include="ParticleVS.hlsl" />
+    <FxCompile Include="Resources\Shaders\ParticleGS.hlsl">
+      <Filter>リソース ファイル</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\ParticlePS.hlsl">
+      <Filter>リソース ファイル</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\ParticleVS.hlsl">
+      <Filter>リソース ファイル</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\SpritePixelShader.hlsl">
+      <Filter>リソース ファイル</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\SpriteVertexShader.hlsl">
+      <Filter>リソース ファイル</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DirectXInitialize.cpp">
